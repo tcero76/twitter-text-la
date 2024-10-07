@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import { useState} from 'react'
 import { ICurorChangeDetail } from './ts/types';
 import { InsertText } from './ts/ProcessKeyboard';
 import CursorEvent from './ts/CursorEvent';

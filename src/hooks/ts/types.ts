@@ -54,6 +54,12 @@ export interface INullCurorChangeDetail {
     end: null;
 }
 
+export type ChangeTextArgs = {
+    text:string | null
+    cursorLocation: ICurorChangeDetail | null
+    caretCoordinates: {top:number, left: number}
+}
+
 export interface ITweetTextareaProps
     extends Omit<
         React.HTMLAttributes<HTMLDivElement>,
@@ -63,6 +69,7 @@ export interface ITweetTextareaProps
     placeholder?: string;
     value?: string;
     cursorPosition?: ICurorChangeDetail;
+    onChangeText: (event:ChangeTextArgs) => void;
     onTextUpdate?: (event: CustomEvent<ITextUpdateDetail>) => void;
     onCursorChange?: (event: CustomEvent<ICurorChangeDetail>) => void;
 }

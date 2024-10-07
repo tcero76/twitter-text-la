@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, forwardRef } from "react";
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import patterns from "./hooks/ts/patterns.ts";
 import customEvents from "./hooks/ts/customEvents.ts";
 import { ICurorChangeDetail, ITweetTextareaProps } from "./hooks/ts/types.ts";
@@ -11,7 +11,7 @@ import { ProcessKeyboardProcess,
 import ProcessParagraph from "./hooks/ts/ProcessParagraph.ts";
 import ProcessPaste from "./hooks/ts/ProcessPaste.ts";
 import CursorEvent from "./hooks/ts/CursorEvent.ts";
-import { useSuggestion } from "./hooks/useSuggestion.tsx";
+// import { useSuggestion } from "./hooks/useSuggestion.tsx";
 
 const STORAGE_KEY = "highlightPattern";
 let insertLineBreak:InsertLineBreak
@@ -24,9 +24,21 @@ let cursorEvent:CursorEvent
 let formatText:FormatText
 const textAreaCols = 40;
 
-const Highlight = forwardRef<HTMLDivElement | null, ITweetTextareaProps>((
-	{className, highlightClassName = '', placeholder, value, cursorPosition, onTextUpdate, onCursorChange, ...htmlDivAttributes }: ITweetTextareaProps,
-	ref: React.ForwardedRef<HTMLDivElement>
+export type HighlightHandle = {
+    insertSuggestionAtCaret: (suggestion:string) => void
+}
+
+const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
+	{className,
+        highlightClassName = '',
+        placeholder,
+        value,
+        cursorPosition,
+        onChangeText,
+        onTextUpdate,
+        onCursorChange,
+        ...htmlDivAttributes }: ITweetTextareaProps,
+	ref: React.ForwardedRef<HighlightHandle>
 	): JSX.Element => {
 		const editorRef = useRef<HTMLDivElement>(document.createElement('div'));
 		const [text, setText] = useState<string>("");
@@ -118,23 +130,54 @@ const Highlight = forwardRef<HTMLDivElement | null, ITweetTextareaProps>((
 			}
 		}, [textCursorPosition, repositionCursor]);
 
-		const {
-			insertSuggestionAtCaret,
-			onChangeTextArea,
-			modalPosition,
-			suggestions
-		} = useSuggestion({setText,
-			text,
-			setTextCursorPosition,
-			setShowModal,
-			insertText,
-			editor: editorRef.current,
-			cursorEvent
-		});
+        useImperativeHandle(ref, () => {
+            return {
+                insertSuggestionAtCaret(suggestion: string):void {
+                    const iNodeAndOffset = insertText.NodeAndOffset
+                    if(iNodeAndOffset) {
+                        const { node } = iNodeAndOffset
+                        const word = node.textContent
+                        if (!word) return
+                        const beforeAfterText = text?.split(word,-1);
+                        const newText = beforeAfterText[0] + '#' + suggestion + beforeAfterText[1];
+                        const position = beforeAfterText[0].length + suggestion.length + 1;
+                        setText(newText);
+                        setTextCursorPosition({start:position, end:position});
+                        setShowModal(false);
+                    }
+            }
+            }
+            
+        })
+
+		// const {
+		// 	insertSuggestionAtCaret,
+		// 	onChangeTextArea,
+		// 	modalPosition,
+		// 	suggestions
+		// } = useSuggestion({
+        //     setText,
+		// 	text,
+		// 	setTextCursorPosition,
+		// 	setShowModal,
+		// 	insertText,
+		// 	editor: editorRef.current,
+		// 	cursorEvent
+		// });
 
 
 		const keyDownListener = (event: React.KeyboardEvent<HTMLDivElement>) => {
-			onChangeTextArea(event)
+			const range = document.getSelection()?.getRangeAt(0);
+			const editor = editorRef.current
+            const rect = editor.getBoundingClientRect();
+            const cursorLocation = cursorEvent?.getCursorLocation(editor, range)
+            if (cursorLocation) {
+                onChangeText({text: editor.textContent,
+                    cursorLocation,
+                    caretCoordinates: { top: rect.height + 30,
+                        left: rect.left + cursorLocation.start + 20}})
+
+            }
 			repeat = event.repeat && event.key !== "Enter" && event.key !== "Backspace";
 			if (repeat) {
 				repeatCount = repeatCount++;
@@ -196,7 +239,6 @@ const Highlight = forwardRef<HTMLDivElement | null, ITweetTextareaProps>((
 				if (cursorPosition) customEvents.dispatchCursorChangeEvent(editorRef.current, cursorPosition);
 			}
 		};
-
 		return (
 			<div className={`tweet-textarea ${className || "tweet-textarea-general-style" }`}>
 				{text.length === 0 && placeholder && (<div className="placeholder">{placeholder}</div>)}
@@ -212,38 +254,6 @@ const Highlight = forwardRef<HTMLDivElement | null, ITweetTextareaProps>((
 					onMouseUp={cursorEventDispatch}
 					contentEditable
 				/>
-				{showModal && (
-					<div id="suggestions"
-					style={{
-						position: "absolute",
-						top: modalPosition.top,
-						left: modalPosition.left,
-						backgroundColor: "white",
-						border: "1px solid #ccc",
-						padding: "10px",
-						boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-						zIndex: 10,
-						maxHeight: "150px",
-						overflowY: "auto",
-					}}
-					>
-					{suggestions.map((s, idx) => (
-						<div
-						id={idx.toString()}
-						key={idx}
-						className="suggestion"
-						style={{
-							padding: "5px",
-							cursor: "pointer",
-						}}
-						onClick={() => insertSuggestionAtCaret(s)}
-						>
-						{s}
-						</div>
-					))}
-					</div>
-				)}
-
 			</div>
 
 		);
