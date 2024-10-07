@@ -46,7 +46,6 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 		const [repositionCursor, setRepositionCursor] = useState<boolean>(false);
 		let repeat:boolean = false
 		let repeatCount:number = 0
-		const [showModal, setShowModal] = useState(false);
 
 		useEffect(() => {
 			let pattern:RegExp | null = null;
@@ -143,7 +142,6 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
                         const position = beforeAfterText[0].length + suggestion.length + 1;
                         setText(newText);
                         setTextCursorPosition({start:position, end:position});
-                        setShowModal(false);
                     }
             }
             }
@@ -168,6 +166,7 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 
 		const keyDownListener = (event: React.KeyboardEvent<HTMLDivElement>) => {
 			const range = document.getSelection()?.getRangeAt(0);
+            if(!range) return
 			const editor = editorRef.current
             const rect = editor.getBoundingClientRect();
             const cursorLocation = cursorEvent?.getCursorLocation(editor, range)

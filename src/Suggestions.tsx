@@ -36,6 +36,10 @@ const Suggestions = ({
             }
         }
     },[changeTextArgs])
+    const onClickSuggestion = (suggestion:string) => {
+        setShowModal(false)
+        onInsertSuggestion(suggestion)
+    }
     return (
         <>
         {showModal && (
@@ -62,7 +66,7 @@ const Suggestions = ({
                     padding: "5px",
                     cursor: "pointer",
                 }}
-                onClick={() => onInsertSuggestion(s)}
+                onClick={() => onClickSuggestion(s)}
                 >
                 {s}
                 </div>
