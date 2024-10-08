@@ -1,7 +1,12 @@
-import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
+import React, { useState,
+	useEffect,
+	useRef,
+	forwardRef,
+	useImperativeHandle } from "react";
 import patterns from "./ts/patterns.ts";
 import customEvents from "./ts/customEvents.ts";
-import { ICurorChangeDetail, ITweetTextareaProps } from "./ts/types.ts";
+import { ICurorChangeDetail,
+	ITweetTextareaProps } from "./ts/types.ts";
 import "./static/editorStyles.css";
 import { ProcessKeyboardProcess,
 	InsertLineBreak,
@@ -11,7 +16,6 @@ import { ProcessKeyboardProcess,
 import ProcessParagraph from "./ts/ProcessParagraph.ts";
 import ProcessPaste from "./ts/ProcessPaste.ts";
 import CursorEvent from "./ts/CursorEvent.ts";
-// import { useSuggestion } from "./hooks/useSuggestion.tsx";
 
 const STORAGE_KEY = "highlightPattern";
 let insertLineBreak:InsertLineBreak
@@ -22,7 +26,6 @@ let processParagraph:ProcessParagraph
 let processPaste:ProcessPaste
 let cursorEvent:CursorEvent
 let formatText:FormatText
-const textAreaCols = 40;
 
 export type HighlightHandle = {
     insertSuggestionAtCaret: (suggestion:string) => void
@@ -32,11 +35,8 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 	{className,
         highlightClassName = '',
         placeholder,
-        value,
         cursorPosition,
         onChangeText,
-        onTextUpdate,
-        onCursorChange,
         ...htmlDivAttributes }: ITweetTextareaProps,
 	ref: React.ForwardedRef<HighlightHandle>
 	): JSX.Element => {
@@ -75,30 +75,6 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 			}
 
 		}, []);
-
-		useEffect(() => {
-			if (onTextUpdate) {
-				editorRef.current.addEventListener(customEvents.textUpdateEvent, onTextUpdate as EventListener);
-			}
-			if (onCursorChange) {
-				editorRef.current.addEventListener(customEvents.cursorChangeEvent, onCursorChange as EventListener);
-			}
-			return () => {
-				if (onTextUpdate) {
-					editorRef.current.removeEventListener(customEvents.textUpdateEvent, onTextUpdate as EventListener);
-				}
-
-				if (onCursorChange) {
-					editorRef.current.removeEventListener(customEvents.cursorChangeEvent, onCursorChange as EventListener);
-				}
-			};
-		}, [editorRef.current, onTextUpdate, onCursorChange]);
-
-		useEffect(() => {
-			if (text !== value && value !== undefined) {
-				setText(value);
-			}
-		}, [value]);
 
 		useEffect(() => {
 			const editor = editorRef.current;
@@ -147,22 +123,6 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
             }
             
         })
-
-		// const {
-		// 	insertSuggestionAtCaret,
-		// 	onChangeTextArea,
-		// 	modalPosition,
-		// 	suggestions
-		// } = useSuggestion({
-        //     setText,
-		// 	text,
-		// 	setTextCursorPosition,
-		// 	setShowModal,
-		// 	insertText,
-		// 	editor: editorRef.current,
-		// 	cursorEvent
-		// });
-
 
 		const keyDownListener = (event: React.KeyboardEvent<HTMLDivElement>) => {
 			const range = document.getSelection()?.getRangeAt(0);
