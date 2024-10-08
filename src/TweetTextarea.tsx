@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import Highlight, { HighlightHandle } from './Highlight';
 import Suggestions from './Suggestions';
-import { ChangeTextArgs } from './hooks/ts/types';
+import { ChangeTextArgs } from './ts/types';
 
 type HighlightProps = {
 	className:string

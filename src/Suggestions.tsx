@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { ChangeTextArgs } from './hooks/ts/types';
+import { ChangeTextArgs } from './ts/types';
 
 export type SuggestionsProps = {
     changeTextArgs:ChangeTextArgs | null;

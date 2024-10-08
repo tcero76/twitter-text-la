@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
-import patterns from "./hooks/ts/patterns.ts";
-import customEvents from "./hooks/ts/customEvents.ts";
-import { ICurorChangeDetail, ITweetTextareaProps } from "./hooks/ts/types.ts";
+import patterns from "./ts/patterns.ts";
+import customEvents from "./ts/customEvents.ts";
+import { ICurorChangeDetail, ITweetTextareaProps } from "./ts/types.ts";
 import "./static/editorStyles.css";
 import { ProcessKeyboardProcess,
 	InsertLineBreak,
 	InsertParagraph,
 	InsertText, 
-	FormatText} from './hooks/ts/ProcessKeyboard.ts'
-import ProcessParagraph from "./hooks/ts/ProcessParagraph.ts";
-import ProcessPaste from "./hooks/ts/ProcessPaste.ts";
-import CursorEvent from "./hooks/ts/CursorEvent.ts";
+	FormatText} from './ts/ProcessKeyboard.ts'
+import ProcessParagraph from "./ts/ProcessParagraph.ts";
+import ProcessPaste from "./ts/ProcessPaste.ts";
+import CursorEvent from "./ts/CursorEvent.ts";
 // import { useSuggestion } from "./hooks/useSuggestion.tsx";
 
 const STORAGE_KEY = "highlightPattern";
