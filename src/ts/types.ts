@@ -19,6 +19,9 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import { FormatText, InsertLineBreak, InsertParagraph, InsertText } from "./ProcessKeyboard";
+import ProcessPaste from "./ProcessPaste";
+
 export interface INodeAndOffset {
     node: Element;
     offset: number;
@@ -60,6 +63,14 @@ export type ChangeTextArgs = {
     caretCoordinates: {top:number, left: number}
 }
 
+export type ProcessType = {
+	insertLineBreak:InsertLineBreak
+	insertParagraph:InsertParagraph
+	insertText:InsertText
+	processPaste:ProcessPaste
+	formatText:FormatText
+}
+
 export interface ITweetTextareaProps
     extends Omit<
         React.HTMLAttributes<HTMLDivElement>,
@@ -69,6 +80,7 @@ export interface ITweetTextareaProps
     placeholder?: string;
     value?: string;
     cursorPosition?: ICurorChangeDetail;
+    process:ProcessType | null;
     onChangeText: (event:ChangeTextArgs) => void;
     onTextUpdate?: (event: CustomEvent<ITextUpdateDetail>) => void;
     onCursorChange?: (event: CustomEvent<ICurorChangeDetail>) => void;

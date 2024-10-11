@@ -3,39 +3,25 @@ import React, { useState,
 	useRef,
 	forwardRef,
 	useImperativeHandle } from "react";
-import patterns from "./ts/patterns.ts";
 import customEvents from "./ts/customEvents.ts";
 import { ICurorChangeDetail,
 	ITweetTextareaProps } from "./ts/types.ts";
 import "./static/editorStyles.css";
-import { ProcessKeyboardProcess,
-	InsertLineBreak,
-	InsertParagraph,
-	InsertText, 
-	FormatText} from './ts/ProcessKeyboard.ts'
+import { ProcessKeyboardProcess } from "./ts/ProcessKeyboard.ts";
 import ProcessParagraph from "./ts/ProcessParagraph.ts";
-import ProcessPaste from "./ts/ProcessPaste.ts";
 import CursorEvent from "./ts/CursorEvent.ts";
 
-const STORAGE_KEY = "highlightPattern";
-let insertLineBreak:InsertLineBreak
-let insertParagraph:InsertParagraph
-let insertText:InsertText
-var textArea:ProcessKeyboardProcess | null
 let processParagraph:ProcessParagraph
-let processPaste:ProcessPaste
-let cursorEvent:CursorEvent
-let formatText:FormatText
-
+let textArea:ProcessKeyboardProcess | null
 export type HighlightHandle = {
     insertSuggestionAtCaret: (suggestion:string) => void
 }
 
 const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 	{className,
-        highlightClassName = '',
         placeholder,
         cursorPosition,
+		process,
         onChangeText,
         ...htmlDivAttributes }: ITweetTextareaProps,
 	ref: React.ForwardedRef<HighlightHandle>
@@ -46,35 +32,20 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 		const [repositionCursor, setRepositionCursor] = useState<boolean>(false);
 		let repeat:boolean = false
 		let repeatCount:number = 0
+		let cursorEvent:CursorEvent = new CursorEvent()
+		if(process) {
+			var {
+				insertLineBreak,
+				insertParagraph,
+				insertText,
+				processPaste,
+				formatText
+			} = process
+		}
 
 		useEffect(() => {
-			let pattern:RegExp | null = null;
-			function init(pattern: RegExp) {
-				insertLineBreak = new InsertLineBreak(pattern, highlightClassName)
-				insertParagraph = new InsertParagraph(pattern, highlightClassName)
-				insertText = new InsertText(pattern, highlightClassName)
-				processPaste = new ProcessPaste(pattern, highlightClassName)
-				formatText = new FormatText(pattern, highlightClassName)
-			}
 			processParagraph = new ProcessParagraph(editorRef.current)
-			cursorEvent = new CursorEvent()
-			const storedPattern = window.localStorage.getItem(STORAGE_KEY);
-			if (storedPattern && storedPattern.trim() !== "") {
-				pattern = patterns.patternFromString(storedPattern);
-			}
-			if(pattern){
-				init(pattern)
-			} else {
-				patterns
-					.initPattern()
-					.then((highlightPattern) => {
-						window.localStorage.setItem(STORAGE_KEY, highlightPattern.source);
-						init(highlightPattern)
-					})
-					.catch((err) => console.error(err));
-			}
-
-		}, []);
+		},[editorRef])
 
 		useEffect(() => {
 			const editor = editorRef.current;
@@ -119,9 +90,7 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
                         setText(newText);
                         setTextCursorPosition({start:position, end:position});
                     }
-            }
-            }
-            
+            }}
         })
 
 		const keyDownListener = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -148,16 +117,14 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 		const beforeInputListener = (event: React.FormEvent<HTMLDivElement>) => {
 			const currentText = processParagraph.processParagraph(event);
 			setText(currentText);
-			if (!event.isDefaultPrevented()) return;
+			if (!event.isDefaultPrevented()) return
 			customEvents.dispatchTextUpdateEvent(editorRef.current, { currentText });
 		};
 
 		const pasteListener = (event: React.ClipboardEvent<HTMLDivElement>) => {
 			const currentText = processPaste.textareaPasteListener(event, editorRef.current);
 			setText(currentText);
-			if (!event.isDefaultPrevented()) {
-				return;
-			}
+			if (!event.isDefaultPrevented()) return
 			customEvents.dispatchTextUpdateEvent(editorRef.current, { currentText });
 		};
 
@@ -166,7 +133,9 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 			const range = document.getSelection()?.getRangeAt(0);
 			const editor = editorRef.current
 			if (!range) return;
-			if (inputType === "deleteContentBackward" || inputType === "deleteContentForward" || inputType === "deleteByCut" ) {
+			if (inputType === "deleteContentBackward"
+				|| inputType === "deleteContentForward"
+				|| inputType === "deleteByCut") {
 				if (editor.childNodes.length === 1 && editor.textContent?.length === 0 ) {
 					while (editor.firstChild) {
 						editor.removeChild(editor.firstChild);
@@ -181,7 +150,7 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 			} else {
 				textArea = insertText
 			}
-			textArea?.process(range,repeat,repeatCount)
+			textArea?.process(range, repeat, repeatCount)
 			editor.normalize();
 			const currentText = Array.from(editor.childNodes)
 				.map((p) => p.textContent)
@@ -189,7 +158,6 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 			setText(currentText);
 			customEvents.dispatchTextUpdateEvent(editor, { currentText });
 		};
-
 		const cursorEventDispatch = () => {
 			const selection = document.getSelection()
 			if (selection && selection.rangeCount) {
