@@ -3,7 +3,6 @@ import React, { useState,
 	useRef,
 	forwardRef,
 	useImperativeHandle } from "react";
-import customEvents from "./ts/customEvents.ts";
 import { ICurorChangeDetail,
 	ITweetTextareaProps } from "./ts/types.ts";
 import "./static/editorStyles.css";
@@ -29,7 +28,6 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 		const editorRef = useRef<HTMLDivElement>(document.createElement('div'));
 		const [text, setText] = useState<string>("");
 		const [textCursorPosition, setTextCursorPosition] = useState<ICurorChangeDetail>({ start: 0, end: 0 });
-		const [repositionCursor, setRepositionCursor] = useState<boolean>(false);
 		let repeat:boolean = false
 		let repeatCount:number = 0
 		let cursorEvent:CursorEvent = new CursorEvent()
@@ -65,16 +63,9 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 				if (cursorPosition) {
 					setTextCursorPosition(cursorPosition);
 				}
-				setRepositionCursor(true);
-			}
-		}, [text]);
-
-		useEffect(() => {
-			if (repositionCursor) {
-				setRepositionCursor(false);
 				processPaste.repositionCursorInTextarea(editorRef.current,textCursorPosition);
 			}
-		}, [textCursorPosition, repositionCursor]);
+		}, [text]);
 
         useImperativeHandle(ref, () => {
             return {
@@ -117,15 +108,11 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 		const beforeInputListener = (event: React.FormEvent<HTMLDivElement>) => {
 			const currentText = processParagraph.processParagraph(event);
 			setText(currentText);
-			if (!event.isDefaultPrevented()) return
-			customEvents.dispatchTextUpdateEvent(editorRef.current, { currentText });
 		};
 
 		const pasteListener = (event: React.ClipboardEvent<HTMLDivElement>) => {
 			const currentText = processPaste.textareaPasteListener(event, editorRef.current);
 			setText(currentText);
-			if (!event.isDefaultPrevented()) return
-			customEvents.dispatchTextUpdateEvent(editorRef.current, { currentText });
 		};
 
 		const inputListener = (event: React.FormEvent<HTMLDivElement>) => {
@@ -156,15 +143,6 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 				.map((p) => p.textContent)
 				.join("\n");
 			setText(currentText);
-			customEvents.dispatchTextUpdateEvent(editor, { currentText });
-		};
-		const cursorEventDispatch = () => {
-			const selection = document.getSelection()
-			if (selection && selection.rangeCount) {
-				const range = selection.getRangeAt(0)
-				const cursorPosition = cursorEvent.getCursorLocation(editorRef.current,range);
-				if (cursorPosition) customEvents.dispatchCursorChangeEvent(editorRef.current, cursorPosition);
-			}
 		};
 		return (
 			<div className={`tweet-textarea ${className || "tweet-textarea-general-style" }`}>
@@ -177,8 +155,6 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 					onBeforeInput={beforeInputListener}
 					onPaste={pasteListener}
 					onInput={inputListener}
-					onKeyUp={cursorEventDispatch}
-					onMouseUp={cursorEventDispatch}
 					contentEditable
 				/>
 			</div>
