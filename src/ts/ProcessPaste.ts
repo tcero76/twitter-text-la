@@ -1,6 +1,5 @@
-import { ICurorChangeDetail, INodeAndOffset } from "./types";
-import { ProcessKeyboard } from "./ProcessKeyboard";
-
+import { ICursorChangeDetail, INodeAndOffset } from "./types";
+import ProcessKeyboard from "./interfaces/ProcessKeyboard";
 
 class ProcessPaste extends ProcessKeyboard {
 
@@ -14,7 +13,7 @@ class ProcessPaste extends ProcessKeyboard {
         }
     }
 
-    public repositionCursorInTextarea(editor: HTMLDivElement, cursorPosition: ICurorChangeDetail): void {
+    public repositionCursorInTextarea(editor: HTMLDivElement, cursorPosition: ICursorChangeDetail): void {
         if (editor.childNodes.length === 0) {
             return;
         }

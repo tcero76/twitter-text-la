@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import { ChangeTextArgs } from './ts/types';
+import { useEffect, useState } from 'react'
+import { type SuggestionsProps } from './ts/types';
 
-export type SuggestionsProps = {
-    changeTextArgs:ChangeTextArgs | null;
-    onInsertSuggestion:(suggestion: string) => void
-}
+
 const allSuggestions = ["apple", "applebeans", "banana", "cherry", "date", "elderberry", "fig", "grape"];
 const Suggestions = ({
     changeTextArgs,

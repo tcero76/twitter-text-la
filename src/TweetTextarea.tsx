@@ -1,25 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Highlight, { HighlightHandle } from './Highlight';
+import Highlight from './Highlight';
 import Suggestions from './Suggestions';
-import { ChangeTextArgs, ProcessType } from './ts/types';
+import { type HighlightProps,
+	type ChangeTextArgs,
+	type HighlightHandle,
+	type ProcessType } from './ts/types';
 import patterns from "./ts/patterns.ts";
-import {
-	InsertLineBreak,
-	InsertParagraph,
-	InsertText, 
-	FormatText} from './ts/ProcessKeyboard.ts'
+import InsertLineBreak from './ts/InsertLineBreak'
+import InsertParagraph from './ts/interfaces/InsertParagraph'
+import InsertText from './ts/InsertText'
+import FormatText from './ts/FormatText.ts'
 import ProcessPaste from "./ts/ProcessPaste.ts";
-type HighlightProps = {
-	className:string
-	highlightClassName:string
-}
+const STORAGE_KEY = "highlightPattern";
+
 
 const TweetTextarea:React.FC<HighlightProps> =  ({
 	className,
 	highlightClassName = ''}:HighlightProps) => {
 	const [changeTextArgs, setChangeTextArgs ] = useState<ChangeTextArgs | null>(null)
 	const highlightRef = useRef<HighlightHandle>({insertSuggestionAtCaret: (suggestion:string) => null})
-	const STORAGE_KEY = "highlightPattern";
 	let [process, setProcess] = useState<ProcessType | null>(null)
 	const [pattern, setPattern ] = useState<RegExp | null>(null) ;
 	useEffect(() => {

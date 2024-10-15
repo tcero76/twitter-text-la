@@ -1,25 +1,7 @@
-/**
- * The MIT License (MIT)
- *
- * Copyright © 2022 Abdelrahman Said
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
- * and associated documentation files (the “Software”), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial
- * portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
-import { FormatText, InsertLineBreak, InsertParagraph, InsertText } from "./ProcessKeyboard";
+import FormatText from "./FormatText";
+import InsertLineBreak from "./InsertLineBreak";
+import InsertText from "./InsertText";
+import InsertParagraph from "./interfaces/InsertParagraph";
 import ProcessPaste from "./ProcessPaste";
 
 export interface INodeAndOffset {
@@ -32,34 +14,18 @@ export interface INullNodeAndOffset {
     offset: null;
 }
 
-export interface IRangeStartAndEnd {
-    start: INodeAndOffset;
-    end: INodeAndOffset;
-}
-
-export interface INodeTriplet {
-    active: ChildNode;
-    start: INodeAndOffset;
-    end: INodeAndOffset;
-}
-
 export interface ITextUpdateDetail {
     currentText: string;
 }
 
-export interface ICurorChangeDetail {
+export interface ICursorChangeDetail {
     start: number;
     end: number;
 }
 
-export interface INullCurorChangeDetail {
-    start: null;
-    end: null;
-}
-
 export type ChangeTextArgs = {
     text:string | null
-    cursorLocation: ICurorChangeDetail | null
+    cursorLocation: ICursorChangeDetail | null
     caretCoordinates: {top:number, left: number}
 }
 
@@ -78,10 +44,21 @@ export interface ITweetTextareaProps
     > {
     highlightClassName?: string;
     placeholder?: string;
-    value?: string;
-    cursorPosition?: ICurorChangeDetail;
     process:ProcessType | null;
     onChangeText: (event:ChangeTextArgs) => void;
-    onTextUpdate?: (event: CustomEvent<ITextUpdateDetail>) => void;
-    onCursorChange?: (event: CustomEvent<ICurorChangeDetail>) => void;
+}
+
+export type HighlightHandle = {
+    insertSuggestionAtCaret: (suggestion:string) => void
+}
+
+export type SuggestionsProps = {
+    changeTextArgs:ChangeTextArgs | null;
+    onInsertSuggestion:(suggestion: string) => void
+}
+
+
+export type HighlightProps = {
+	className:string
+	highlightClassName:string
 }

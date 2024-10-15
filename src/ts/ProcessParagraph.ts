@@ -1,4 +1,4 @@
-import { Process } from "./ProcessKeyboard";
+import Process from "./interfaces/Process";
 
 class ProcessParagraph extends Process {
 

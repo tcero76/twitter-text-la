@@ -3,31 +3,28 @@ import React, { useState,
 	useRef,
 	forwardRef,
 	useImperativeHandle } from "react";
-import { ICurorChangeDetail,
-	ITweetTextareaProps } from "./ts/types.ts";
+import { type HighlightHandle,
+	ICursorChangeDetail,
+	type ITweetTextareaProps } from "./ts/types.ts";
 import "./static/editorStyles.css";
-import { ProcessKeyboardProcess } from "./ts/ProcessKeyboard.ts";
-import ProcessParagraph from "./ts/ProcessParagraph.ts";
-import CursorEvent from "./ts/CursorEvent.ts";
+import ProcessKeyboardProcess from "./ts/interfaces/ProcessKeyboardProcess.ts";
+import ProcessParagraph from "./ts/ProcessParagraph";
+import CursorEvent from "./ts/CursorEvent";
 
 let processParagraph:ProcessParagraph
 let textArea:ProcessKeyboardProcess | null
-export type HighlightHandle = {
-    insertSuggestionAtCaret: (suggestion:string) => void
-}
 
-const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
-	{className,
-        placeholder,
-        cursorPosition,
-		process,
-        onChangeText,
-        ...htmlDivAttributes }: ITweetTextareaProps,
+const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
+	highlightClassName,
+	placeholder,
+	process,
+	onChangeText,
+	...htmlDivAttributes }: ITweetTextareaProps,
 	ref: React.ForwardedRef<HighlightHandle>
 	): JSX.Element => {
 		const editorRef = useRef<HTMLDivElement>(document.createElement('div'));
 		const [text, setText] = useState<string>("");
-		const [textCursorPosition, setTextCursorPosition] = useState<ICurorChangeDetail>({ start: 0, end: 0 });
+		const [textCursorPosition, setTextCursorPosition] = useState<ICursorChangeDetail>({ start: 0, end: 0 });
 		let repeat:boolean = false
 		let repeatCount:number = 0
 		let cursorEvent:CursorEvent = new CursorEvent()
@@ -40,6 +37,23 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 				formatText
 			} = process
 		}
+
+        useImperativeHandle(ref, () => {
+            return {
+                insertSuggestionAtCaret(suggestion: string):void {
+                    const iNodeAndOffset = insertText.NodeAndOffset
+                    if(iNodeAndOffset) {
+                        const { node } = iNodeAndOffset
+                        const word = node.textContent
+                        if (!word) return
+                        const beforeAfterText = text?.split(word,-1);
+                        const newText = beforeAfterText[0] + '#' + suggestion + beforeAfterText[1];
+                        const position = beforeAfterText[0].length + suggestion.length + 1;
+                        setText(newText);
+                        setTextCursorPosition({start:position, end:position});
+                    }
+            }}
+        })
 
 		useEffect(() => {
 			processParagraph = new ProcessParagraph(editorRef.current)
@@ -60,29 +74,9 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 				if (range) {
 					formatText.formatAfterUpdatingTextFromParent(editor, range, text);
 				}
-				if (cursorPosition) {
-					setTextCursorPosition(cursorPosition);
-				}
 				processPaste.repositionCursorInTextarea(editorRef.current,textCursorPosition);
 			}
 		}, [text]);
-
-        useImperativeHandle(ref, () => {
-            return {
-                insertSuggestionAtCaret(suggestion: string):void {
-                    const iNodeAndOffset = insertText.NodeAndOffset
-                    if(iNodeAndOffset) {
-                        const { node } = iNodeAndOffset
-                        const word = node.textContent
-                        if (!word) return
-                        const beforeAfterText = text?.split(word,-1);
-                        const newText = beforeAfterText[0] + '#' + suggestion + beforeAfterText[1];
-                        const position = beforeAfterText[0].length + suggestion.length + 1;
-                        setText(newText);
-                        setTextCursorPosition({start:position, end:position});
-                    }
-            }}
-        })
 
 		const keyDownListener = (event: React.KeyboardEvent<HTMLDivElement>) => {
 			const range = document.getSelection()?.getRangeAt(0);
@@ -145,7 +139,7 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>((
 			setText(currentText);
 		};
 		return (
-			<div className={`tweet-textarea ${className || "tweet-textarea-general-style" }`}>
+			<div className={`tweet-textarea ${highlightClassName || "tweet-textarea-general-style" }`}>
 				{text.length === 0 && placeholder && (<div className="placeholder">{placeholder}</div>)}
 				<div
 					{...htmlDivAttributes}

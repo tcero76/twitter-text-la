@@ -1,5 +1,5 @@
-import { ICurorChangeDetail } from "./types";
-import { Process } from "./ProcessKeyboard";
+import { ICursorChangeDetail } from "./types";
+import Process from "./interfaces/Process";
 
 class CursorEvent extends Process {
 
@@ -42,7 +42,7 @@ class CursorEvent extends Process {
         return this.sumTextLengthOfNodesArray(arr, newlineCount);
     }
 
-    public getCursorLocation(divElement: HTMLDivElement, range: Range): ICurorChangeDetail | null {
+    public getCursorLocation(divElement: HTMLDivElement, range: Range): ICursorChangeDetail | null {
         let start: number;
         let end: number;
         if (divElement.childNodes.length === 0) {
