@@ -4,7 +4,6 @@ import React, { useState,
 	forwardRef,
 	useImperativeHandle } from "react";
 import { type HighlightHandle,
-	ICursorChangeDetail,
 	type ITweetTextareaProps } from "./ts/types.ts";
 import "./static/editorStyles.css";
 import ProcessKeyboardProcess from "./ts/interfaces/ProcessKeyboardProcess.ts";
@@ -24,9 +23,6 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 	): JSX.Element => {
 		const editorRef = useRef<HTMLDivElement>(document.createElement('div'));
 		const [text, setText] = useState<string>("");
-		const [textCursorPosition, setTextCursorPosition] = useState<ICursorChangeDetail>({ start: 0, end: 0 });
-		let repeat:boolean = false
-		let repeatCount:number = 0
 		let cursorEvent:CursorEvent = new CursorEvent()
 		if(process) {
 			var {
@@ -48,9 +44,12 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
                         if (!word) return
                         const beforeAfterText = text?.split(word,-1);
                         const newText = beforeAfterText[0] + '#' + suggestion + beforeAfterText[1];
-                        const position = beforeAfterText[0].length + suggestion.length + 1;
+                        const position = beforeAfterText[0].length + suggestion.length + 2;
+						formatText.editor = editorRef.current
+						formatText.text = newText
+                        formatText.textCursorPosition = {start:position, end:position};
+						textArea = formatText
                         setText(newText);
-                        setTextCursorPosition({start:position, end:position});
                     }
             }}
         })
@@ -61,20 +60,12 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 
 		useEffect(() => {
 			const editor = editorRef.current;
-			const currentTextInEditor = Array.from(editor.childNodes).map((p) => p.textContent).join("\n");
-			if (currentTextInEditor !== text) {
-				while (editor.firstChild) {
-					editor.removeChild(editor.firstChild);
-				}
-				editor.focus();
-				if (text.length === 0) {
-					return;
-				}
-				const range = document.getSelection()?.getRangeAt(0);
-				if (range) {
-					formatText.formatAfterUpdatingTextFromParent(editor, range, text);
-				}
-				processPaste.repositionCursorInTextarea(editorRef.current,textCursorPosition);
+			// const currentTextInEditor = Array.from(editor.childNodes).map((p) => p.textContent).join("\n");
+			const selection = document.getSelection();
+			editor.focus();
+			const range = selection?.getRangeAt(0)
+			if (range) {
+				textArea?.process(range)
 			}
 		}, [text]);
 
@@ -91,11 +82,12 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
                         left: rect.left + cursorLocation.start + 20}})
 
             }
-			repeat = event.repeat && event.key !== "Enter" && event.key !== "Backspace";
-			if (repeat) {
-				repeatCount = repeatCount++;
+			if (event.repeat && event.key !== "Enter" && event.key !== "Backspace") {
+				insertText.incRepeatCount();
+				insertText.repeat = true
 			} else {
-				repeatCount = 0;
+				insertText.repeatCount = 0
+				insertText.repeat = false
 			}
 		}; 
 
@@ -131,7 +123,6 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 			} else {
 				textArea = insertText
 			}
-			textArea?.process(range, repeat, repeatCount)
 			editor.normalize();
 			const currentText = Array.from(editor.childNodes)
 				.map((p) => p.textContent)

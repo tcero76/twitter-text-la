@@ -2,7 +2,7 @@
 import ProcessKeyboardProcess from "./ProcessKeyboardProcess";
 
 class InsertParagraph extends ProcessKeyboardProcess {
-	public 	process(range:Range, repeat:boolean, repeatCount:number): void {
+	public 	process(range:Range): void {
 		this.formatAfterNewParagraph(range);
 	}
 }

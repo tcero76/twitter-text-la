@@ -2,7 +2,7 @@ import ProcessKeyboardProcess from "./interfaces/ProcessKeyboardProcess";
 
 class InsertLineBreak extends ProcessKeyboardProcess {
 
-	public process(range:Range, repeat:boolean, repeatCount:number): void {
+	public process(range:Range): void {
 			let { startContainer, startOffset } = range;
 			const currentParagraph = this.getParentParagraph(startContainer);
 			const endOffset = (currentParagraph as Element).childNodes.length;

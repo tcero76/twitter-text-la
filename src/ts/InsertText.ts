@@ -4,19 +4,16 @@ import { INodeAndOffset, INullNodeAndOffset } from "./types"
 class InsertText extends ProcessKeyboardProcess {
 
 	private iNodeAndOffset:INullNodeAndOffset | null = null
+	private _repeat:boolean
+	private _repeatCount:number
 
 	constructor(pattern: RegExp, highlightClassName:string) {
 		super(pattern, highlightClassName)
-		let range:Range | null 
-		const rangeCount = document.getSelection()?.rangeCount
-		if(rangeCount) {
-			range = document.getSelection()?.getRangeAt(0)!!
-		} else {
-			range = null
-		}
+		this._repeat = false
+		this._repeatCount =  0
 	}
 
-	public process(range:Range, repeat:boolean, repeatCount:number):void {
+	public process(range:Range):void {
 		const iNodeAndOffset = this.getCurrentNodeAndOffset(range);
 		if (!iNodeAndOffset) return
 		let { node, offset } = iNodeAndOffset
@@ -45,7 +42,7 @@ class InsertText extends ProcessKeyboardProcess {
 		if (offsetInParent === undefined) {
 			return;
 		}
-		if (repeat && repeatCount > 6) {
+		if (this._repeat && this._repeatCount > 6) {
 			return;
 		}
 		range.setStart(startNode, startOffset);
@@ -116,6 +113,18 @@ class InsertText extends ProcessKeyboardProcess {
 			}
 		}
 		return { node, offset };
+	}
+
+	set repeat(value:boolean) {
+		this._repeat = value
+	}
+
+	public incRepeatCount() {
+		this._repeatCount++
+	}
+
+	set repeatCount(value:number) {
+		this._repeatCount = value
 	}
 
 	get NodeAndOffset() {

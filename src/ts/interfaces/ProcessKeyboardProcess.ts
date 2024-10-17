@@ -6,7 +6,7 @@ abstract class ProcessKeyboardProcess extends ProcessKeyboard {
 		super(pattern, highlightClassName)
 	}
 
-	abstract process(range:Range, repeat:boolean, repeatCount:number): void;
+	abstract process(range:Range): void;
 }
 
 export default ProcessKeyboardProcess

@@ -68,8 +68,8 @@ test("when the user write two words whith first char a shard", async ({
 	page
 }) => {
 	const editor = page.locator("div.input-area")
-	await editor.pressSequentially("Lorem", { delay: 50})
-	await editor.pressSequentially(" #ch", { delay: 50})
+	await editor.pressSequentially("Lorem", { delay: 500})
+	await editor.pressSequentially(" #ch", { delay: 500})
 	await page.click('div.suggestion', { delay: 500})
 	await editor.pressSequentially(" ipsum #applebe", { delay: 50})
 	await page.click('div.suggestion', { delay: 500})
@@ -80,10 +80,10 @@ test("when the user write two words whith first char a shard continuous", async 
 	page
 }) => {
 	const editor = page.locator("div.input-area")
-	await editor.pressSequentially("Lorem", { delay: 50})
-	await editor.pressSequentially(" #ch", { delay: 50})
+	await editor.pressSequentially("Lorem", { delay: 500})
+	await editor.pressSequentially(" #ch", { delay: 500})
 	await page.click('div.suggestion', { delay: 500})
-	await editor.pressSequentially(" #applebe", { delay: 50})
+	await editor.pressSequentially(" #applebe", { delay: 500})
 	await page.click('div.suggestion', { delay: 500})
 	await expect(editor).toHaveText('Lorem #cherry #applebeans')
 })
