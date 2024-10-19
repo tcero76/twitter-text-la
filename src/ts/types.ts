@@ -1,8 +1,8 @@
 import FormatText from "./FormatText";
-import InsertLineBreak from "./InsertLineBreak";
-import InsertText from "./InsertText";
-import InsertParagraph from "./interfaces/InsertParagraph";
-import ProcessPaste from "./ProcessPaste";
+import InsertLineBreak from "./impl/InsertLineBreak";
+import InsertText from "./impl/InsertText";
+import InsertParagraph from "./InsertParagraph";
+import ProcessPaste from "./impl/ProcessPaste";
 
 export interface INodeAndOffset {
     node: Element;

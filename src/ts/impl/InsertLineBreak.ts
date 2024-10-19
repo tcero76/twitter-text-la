@@ -1,6 +1,6 @@
-import ProcessKeyboardProcess from "./interfaces/ProcessKeyboardProcess";
+import ProcessKeyboard from "../interfaces/ProcessKeyboard";
 
-class InsertLineBreak extends ProcessKeyboardProcess {
+class InsertLineBreak extends ProcessKeyboard {
 
 	public process(range:Range): void {
 			let { startContainer, startOffset } = range;

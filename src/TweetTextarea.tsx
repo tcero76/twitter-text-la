@@ -5,12 +5,12 @@ import { type HighlightProps,
 	type ChangeTextArgs,
 	type HighlightHandle,
 	type ProcessType } from './ts/types';
-import patterns from "./ts/patterns.ts";
-import InsertLineBreak from './ts/InsertLineBreak'
-import InsertParagraph from './ts/interfaces/InsertParagraph'
-import InsertText from './ts/InsertText'
-import FormatText from './ts/FormatText.ts'
-import ProcessPaste from "./ts/ProcessPaste.ts";
+import patterns from "./ts/impl/patterns.ts";
+import InsertLineBreak from './ts/impl/InsertLineBreak.ts'
+import InsertParagraph from './ts/impl/InsertParagraph.ts'
+import InsertText from './ts/impl/InsertText.ts'
+import FormatText from './ts/impl/FormatText.ts'
+import ProcessPaste from "./ts/impl/ProcessPaste.ts";
 const STORAGE_KEY = "highlightPattern";
 
 

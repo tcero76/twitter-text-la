@@ -1,4 +1,5 @@
-import { validSymbolsExistPattern } from "../patterns";
+import { validSymbolsExistPattern } from "../impl/patterns";
+import { INodeAndOffset } from "../types";
 import Process from './Process'
 
 abstract class ProcessKeyboard extends Process {
@@ -11,6 +12,8 @@ abstract class ProcessKeyboard extends Process {
 		this.highlightClassName = highlightClassName
 		this.pattern = pattern
     }
+
+	abstract process(range:Range): void;
 
 	protected formatAfterNewParagraph (range: Range) {
 		const currentParagraph = this.getCurrentParagraph(range);
@@ -88,6 +91,29 @@ abstract class ProcessKeyboard extends Process {
 		}
 	}
 
+    protected repositionCursorInParagraph(paragraphAndOffset: INodeAndOffset, offset: number): void {
+        const { node: parentParagraph, offset: offsetInParent } = paragraphAndOffset;
+        let currentLength = 0;
+        for (let i = offsetInParent; i < parentParagraph.childNodes.length; i++) {
+            const child = parentParagraph.childNodes[i];
+            if ((child as Element).tagName === "BR") ++currentLength;
+            if (child.textContent?.length !== undefined) {
+                if (currentLength + child.textContent.length < offset) {
+                    currentLength += child.textContent.length;
+                } else {
+                    offset -= currentLength;
+                    let startNode: Node = child;
+                    if (child.nodeType !== 3) {
+                        if (child.firstChild) {
+                            startNode = child.firstChild;
+                        }
+                    }
+                    this.setCursorPosition(startNode, offset);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 export default ProcessKeyboard;

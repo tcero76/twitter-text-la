@@ -1,5 +1,5 @@
-import { ICursorChangeDetail } from "./types";
-import Process from "./interfaces/Process";
+import { ICursorChangeDetail } from "../types";
+import Process from "../interfaces/Process";
 
 class CursorEvent extends Process {
 

@@ -6,12 +6,12 @@ import React, { useState,
 import { type HighlightHandle,
 	type ITweetTextareaProps } from "./ts/types.ts";
 import "./static/editorStyles.css";
-import ProcessKeyboardProcess from "./ts/interfaces/ProcessKeyboardProcess.ts";
-import ProcessParagraph from "./ts/ProcessParagraph";
-import CursorEvent from "./ts/CursorEvent";
+import ProcessKeyboard from "./ts/interfaces/ProcessKeyboard.ts";
+import ProcessParagraph from "./ts/impl/ProcessParagraph.ts";
+import CursorEvent from "./ts/impl/CursorEvent";
 
 let processParagraph:ProcessParagraph
-let textArea:ProcessKeyboardProcess | null
+let textArea:ProcessKeyboard | null
 
 const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 	highlightClassName,
@@ -49,25 +49,28 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 						formatText.text = newText
                         formatText.textCursorPosition = {start:position, end:position};
 						textArea = formatText
-                        setText(newText);
+                        render();
                     }
             }}
         })
 
 		useEffect(() => {
-			processParagraph = new ProcessParagraph(editorRef.current)
+			processParagraph = new ProcessParagraph()
 		},[editorRef])
 
-		useEffect(() => {
+		function render() {
 			const editor = editorRef.current;
-			// const currentTextInEditor = Array.from(editor.childNodes).map((p) => p.textContent).join("\n");
-			const selection = document.getSelection();
 			editor.focus();
+			const selection = document.getSelection();
 			const range = selection?.getRangeAt(0)
 			if (range) {
 				textArea?.process(range)
+				textArea = null
+				setText(Array.from(editor.childNodes)
+					.map((p) => p.textContent)
+					.join("\n"))
 			}
-		}, [text]);
+		};
 
 		const keyDownListener = (event: React.KeyboardEvent<HTMLDivElement>) => {
 			const range = document.getSelection()?.getRangeAt(0);
@@ -80,35 +83,39 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
                     cursorLocation,
                     caretCoordinates: { top: rect.height + 30,
                         left: rect.left + cursorLocation.start + 20}})
-
             }
 			if (event.repeat && event.key !== "Enter" && event.key !== "Backspace") {
 				insertText.incRepeatCount();
 				insertText.repeat = true
 			} else {
-				insertText.repeatCount = 0
+				insertText.repeatCountZero
 				insertText.repeat = false
 			}
 		}; 
 
 		const beforeInputListener = (event: React.FormEvent<HTMLDivElement>) => {
-			const currentText = processParagraph.processParagraph(event);
-			setText(currentText);
+			processParagraph.event = event
+			processParagraph.editor = editorRef.current
+			textArea = processParagraph
+			render();
 		};
 
 		const pasteListener = (event: React.ClipboardEvent<HTMLDivElement>) => {
-			const currentText = processPaste.textareaPasteListener(event, editorRef.current);
-			setText(currentText);
+			processPaste.event = event
+			processPaste.editor = editorRef.current
+			textArea = processPaste;
+			render();
 		};
 
 		const inputListener = (event: React.FormEvent<HTMLDivElement>) => {
 			const inputType = (event.nativeEvent as InputEvent).inputType;
-			const range = document.getSelection()?.getRangeAt(0);
+			const range = document.getSelection()?.getRangeAt(0);	
 			const editor = editorRef.current
 			if (!range) return;
 			if (inputType === "deleteContentBackward"
 				|| inputType === "deleteContentForward"
 				|| inputType === "deleteByCut") {
+				textArea = insertText
 				if (editor.childNodes.length === 1 && editor.textContent?.length === 0 ) {
 					while (editor.firstChild) {
 						editor.removeChild(editor.firstChild);
@@ -123,11 +130,8 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 			} else {
 				textArea = insertText
 			}
-			editor.normalize();
-			const currentText = Array.from(editor.childNodes)
-				.map((p) => p.textContent)
-				.join("\n");
-			setText(currentText);
+			editor.normalize()
+			render()
 		};
 		return (
 			<div className={`tweet-textarea ${highlightClassName || "tweet-textarea-general-style" }`}>

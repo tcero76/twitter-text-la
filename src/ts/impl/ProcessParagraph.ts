@@ -1,57 +1,59 @@
-import Process from "./interfaces/Process";
+import ProcessKeyboard from "../interfaces/ProcessKeyboard";
 
-class ProcessParagraph extends Process {
+class ProcessParagraph extends ProcessKeyboard {
 
-    private editor:HTMLDivElement
+    private _editor:HTMLDivElement | null
+    private _event:React.FormEvent<HTMLDivElement> | null
 
-    constructor(editor:HTMLDivElement) {
-        super()
-        this.editor = editor
+    constructor() {
+        super(new RegExp(""), '')
+        this._editor = null
+        this._event = null
     }
 
-    public processParagraph(event: React.FormEvent<HTMLDivElement>):string {
+    public process():void {
         const selection = document.getSelection();
         const range = selection?.getRangeAt(0);
-        if (!range) return ''
+        if (!range) return
         const selectedText = range?.toString();
-        const inputEvent = event as unknown as InputEvent;
+        const inputEvent = this._event as unknown as InputEvent;
         const data = inputEvent.data;
         const keyboardKey = data === "\n" || data === "\r" 
             ? "Enter"
             : data === " "
                 ? "Space"
                 : inputEvent.data;
-        if (!range.collapsed && selectedText && selectedText.length === this.editor.textContent?.length) {
-            while (this.editor.firstChild) {
-                this.editor.removeChild(this.editor.firstChild);
+        if (!range.collapsed && selectedText && selectedText.length === this._editor?.textContent?.length) {
+            while (this._editor?.firstChild) {
+                this._editor?.removeChild(this._editor?.firstChild);
             }
         }
-        if (this.editor.childNodes.length === 0 && keyboardKey) {
-            event.preventDefault();
+        if (this._editor?.childNodes.length === 0 && keyboardKey) {
+            this._event?.preventDefault();
             const paragraph = document.createElement("p");
             if (keyboardKey === "Enter") {
                 paragraph.innerHTML = "<br>";
                 const paragraph2 = document.createElement("p");
                 paragraph2.innerHTML = "<br>";
-                this.editor.appendChild(paragraph);
-                this.editor.appendChild(paragraph2);
+                this._editor?.appendChild(paragraph);
+                this._editor?.appendChild(paragraph2);
                 this.setCursorPosition(paragraph2, 0);
             } else {
                 const text = keyboardKey === "Space" ? "\u00A0" : keyboardKey;
                 const textNode = document.createTextNode(text);
                 paragraph.appendChild(textNode);
-                this.editor.appendChild(paragraph);
+                this._editor?.appendChild(paragraph);
                 this.setCursorPosition(textNode, 1);
             }
-
         }
         const { startContainer, startOffset } = range;
-        if (startContainer === this.editor) {
-            const paragraph = this.editor.childNodes[startOffset - 1];
+        if (startContainer === this._editor) {
+            const paragraph = this._editor?.childNodes[startOffset - 1];
+            if(!paragraph) return
             this.setCursorPosition(paragraph, paragraph.childNodes.length);
         }
         if (keyboardKey === "Space" && startContainer.parentElement?.tagName === "SPAN" && startOffset === startContainer.textContent?.length) {
-            event.preventDefault();
+            this._event?.preventDefault();
             const spanElement = startContainer.parentElement;
             if (spanElement && spanElement.parentElement) {
                 let offsetInParent = this.findNodeInParent(spanElement.parentElement, spanElement);
@@ -65,10 +67,14 @@ class ProcessParagraph extends Process {
                 }
             }
         }
-        return Array.from(this.editor.childNodes)
-            .map((p) => p.textContent)
-            .join("\n");
-        }
+    }
+    set editor(value:HTMLDivElement) {
+        this._editor = value
+    }
+
+    set event(value:React.FormEvent<HTMLDivElement>) {
+        this._event = value
+    }
 }
 
 export default ProcessParagraph

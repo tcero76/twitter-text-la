@@ -1,7 +1,7 @@
-import ProcessKeyboardProcess from "./interfaces/ProcessKeyboardProcess"
-import { INodeAndOffset, INullNodeAndOffset } from "./types"
+import ProcessKeyboard from "../interfaces/ProcessKeyboard"
+import { INodeAndOffset, INullNodeAndOffset } from "../types"
 
-class InsertText extends ProcessKeyboardProcess {
+class InsertText extends ProcessKeyboard {
 
 	private iNodeAndOffset:INullNodeAndOffset | null = null
 	private _repeat:boolean
@@ -10,7 +10,7 @@ class InsertText extends ProcessKeyboardProcess {
 	constructor(pattern: RegExp, highlightClassName:string) {
 		super(pattern, highlightClassName)
 		this._repeat = false
-		this._repeatCount =  0
+		this._repeatCount = 0
 	}
 
 	public process(range:Range):void {
@@ -123,8 +123,8 @@ class InsertText extends ProcessKeyboardProcess {
 		this._repeatCount++
 	}
 
-	set repeatCount(value:number) {
-		this._repeatCount = value
+	public repeatCountZero() {
+		this._repeatCount = 0
 	}
 
 	get NodeAndOffset() {
