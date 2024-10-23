@@ -115,16 +115,14 @@ class InsertText extends ProcessKeyboard {
 		return { node, offset };
 	}
 
-	set repeat(value:boolean) {
-		this._repeat = value
-	}
-
 	public incRepeatCount() {
 		this._repeatCount++
+		this._repeat = true
 	}
 
-	public repeatCountZero() {
+	public repeatCountReset() {
 		this._repeatCount = 0
+		this._repeat = false
 	}
 
 	get NodeAndOffset() {

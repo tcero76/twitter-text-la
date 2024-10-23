@@ -13,10 +13,10 @@ import FormatText from './ts/impl/FormatText.ts'
 import ProcessPaste from "./ts/impl/ProcessPaste.ts";
 const STORAGE_KEY = "highlightPattern";
 
-
 const TweetTextarea:React.FC<HighlightProps> =  ({
 	className,
-	highlightClassName = ''}:HighlightProps) => {
+	highlightClassName = '',
+	...props}:HighlightProps) => {
 	const [changeTextArgs, setChangeTextArgs ] = useState<ChangeTextArgs | null>(null)
 	const highlightRef = useRef<HighlightHandle>({insertSuggestionAtCaret: (suggestion:string) => null})
 	let [process, setProcess] = useState<ProcessType | null>(null)
@@ -58,6 +58,7 @@ const TweetTextarea:React.FC<HighlightProps> =  ({
 					onChangeText={onChangeText}
 					process={process}
 					ref={highlightRef}
+					{...props}
 				/>
 				<Suggestions changeTextArgs={changeTextArgs} onInsertSuggestion={onInsertSuggestion}/>
 			</>

@@ -18,7 +18,7 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 	placeholder,
 	process,
 	onChangeText,
-	...htmlDivAttributes }: ITweetTextareaProps,
+	...props }: ITweetTextareaProps,
 	ref: React.ForwardedRef<HighlightHandle>
 	): JSX.Element => {
 		const editorRef = useRef<HTMLDivElement>(document.createElement('div'));
@@ -86,10 +86,8 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
             }
 			if (event.repeat && event.key !== "Enter" && event.key !== "Backspace") {
 				insertText.incRepeatCount();
-				insertText.repeat = true
 			} else {
-				insertText.repeatCountZero
-				insertText.repeat = false
+				insertText.repeatCountReset()
 			}
 		}; 
 
@@ -134,10 +132,9 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 			render()
 		};
 		return (
-			<div className={`tweet-textarea ${highlightClassName || "tweet-textarea-general-style" }`}>
+			<div className={`tweet-textarea ${highlightClassName || "tweet-textarea-general-style" }`} {...props}>
 				{text.length === 0 && placeholder && (<div className="placeholder">{placeholder}</div>)}
 				<div
-					{...htmlDivAttributes}
 					ref={editorRef}
 					className="input-area"
 					onKeyDown={keyDownListener}

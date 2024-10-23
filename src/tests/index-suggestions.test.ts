@@ -1,6 +1,14 @@
 import { test, expect } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
+ 	await page.route('http://localhost:5173/api/v1/suggestions', async route => {
+		const suggestions = ["apple", "applebeans", "banana", "cherry", "date", "elderberry", "fig", "grape"]
+		route.fulfill({
+			status: 200,
+			contentType: 'application/json',
+			body: JSON.stringify(suggestions),
+			});
+	  })
 	await page.goto("http://localhost:5173");
 });
 
@@ -8,7 +16,7 @@ test("when the user write some text and use a hash char to iniciate a word", asy
 	page
 }) => {
 	const editor = page.locator("div.input-area")
-	await editor.pressSequentially("Lorem ipsum")
+	await editor.pressSequentially("Lorem ipsum", { delay: 500})
 	for(let i = 0; 6 > i ; i++) {
 		await page.keyboard.press("ArrowLeft")
 	}
@@ -80,7 +88,7 @@ test("when the user write two words whith first char a shard continuous", async 
 	page
 }) => {
 	const editor = page.locator("div.input-area")
-	await editor.pressSequentially("Lorem", { delay: 500})
+	await editor.pressSequentially("Lorem")
 	await editor.pressSequentially(" #ch", { delay: 500})
 	await page.click('div.suggestion', { delay: 500})
 	await editor.pressSequentially(" #applebe", { delay: 500})

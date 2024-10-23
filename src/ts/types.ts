@@ -1,7 +1,8 @@
-import FormatText from "./FormatText";
+import { ComponentPropsWithoutRef } from 'react'
+import FormatText from "./impl/FormatText";
 import InsertLineBreak from "./impl/InsertLineBreak";
 import InsertText from "./impl/InsertText";
-import InsertParagraph from "./InsertParagraph";
+import InsertParagraph from "./impl/InsertParagraph";
 import ProcessPaste from "./impl/ProcessPaste";
 
 export interface INodeAndOffset {
@@ -61,4 +62,4 @@ export type SuggestionsProps = {
 export type HighlightProps = {
 	className:string
 	highlightClassName:string
-}
+} & ComponentPropsWithoutRef<'div'>

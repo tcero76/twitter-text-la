@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { type SuggestionsProps } from './ts/types';
+import { getSuggestion } from './http/http';
+import { AxiosResponse } from 'axios';
 
-
-const allSuggestions = ["apple", "applebeans", "banana", "cherry", "date", "elderberry", "fig", "grape"];
 const Suggestions = ({
     changeTextArgs,
     onInsertSuggestion
@@ -10,6 +10,7 @@ const Suggestions = ({
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
     const [showModal, setShowModal] = useState(false);
+
     useEffect(() => {
         const firstShard:RegExp = /^#/;
         const selection = window.getSelection()
@@ -23,11 +24,17 @@ const Suggestions = ({
             const inputText = text.slice(0, cursorLocation.start);
             const lastWord = inputText.split(/\s/g).pop()??'';
             if(firstShard.test(lastWord)) {
-                const matchingSuggestions = allSuggestions.filter(s =>
-                    s.startsWith(lastWord.replace(firstShard, '')!)
-                );
-                setSuggestions(matchingSuggestions);
-                setShowModal(matchingSuggestions.length > 0);
+                getSuggestion()
+                    .then(res => {
+                        const matchingSuggestions = res.data.filter(s =>
+                            s.startsWith(lastWord.replace(firstShard, '')!)
+                        );
+                        setSuggestions(matchingSuggestions);
+                        setShowModal(matchingSuggestions.length > 0);
+                    })
+                    .catch(res => {
+                        console.error(res.message)
+                    })
             } else {
                 setShowModal(false)
             }
