@@ -1,9 +1,9 @@
 import ProcessKeyboard from "../interfaces/ProcessKeyboard"
-import { INodeAndOffset, INullNodeAndOffset } from "../types"
+import { INodeAndOffset } from "../types"
 
 class InsertText extends ProcessKeyboard {
 
-	private iNodeAndOffset:INullNodeAndOffset | null = null
+	private iNodeAndOffset:INodeAndOffset | null = null
 	private _repeat:boolean
 	private _repeatCount:number
 
@@ -85,7 +85,8 @@ class InsertText extends ProcessKeyboard {
 	public getCurrentNodeAndOffset(range: Range):INodeAndOffset | null  {
 		let node = range.startContainer as Element;
 		let offset = range.startOffset;
-		this.iNodeAndOffset = { node, offset }
+		if(!node || !offset) return null
+		this.iNodeAndOffset = { node , offset }
 		if (node.tagName === "DIV") {
 			const currentParagraph = node.childNodes[offset - 1];
 			this.setCursorPosition(currentParagraph, currentParagraph?.childNodes.length);

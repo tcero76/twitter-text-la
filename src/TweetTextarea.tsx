@@ -18,7 +18,7 @@ const TweetTextarea:React.FC<HighlightProps> =  ({
 	highlightClassName = '',
 	...props}:HighlightProps) => {
 	const [changeTextArgs, setChangeTextArgs ] = useState<ChangeTextArgs | null>(null)
-	const highlightRef = useRef<HighlightHandle>({insertSuggestionAtCaret: (suggestion:string) => null})
+	const highlightRef = useRef<HighlightHandle>({ insertSuggestionAtCaret: () => {} })
 	let [process, setProcess] = useState<ProcessType | null>(null)
 	const [pattern, setPattern ] = useState<RegExp | null>(null) ;
 	useEffect(() => {

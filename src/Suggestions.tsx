@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { type SuggestionsProps } from './ts/types';
 import { getSuggestion } from './http/http';
-import { AxiosResponse } from 'axios';
 
 const Suggestions = ({
     changeTextArgs,

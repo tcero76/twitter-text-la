@@ -50,7 +50,7 @@ class ProcessPaste extends ProcessKeyboard {
             const startParagraph = this.getParentParagraph(startContainer);
             const endParagraph = this.getParentParagraph(endContainer);
             if (!startParagraph) {
-                return '';
+                return;
             }
             let paragraphOffsetInEditor = this.findNodeInParent(this._editor, startParagraph);
             paragraphs.slice(1).forEach((node) => {
@@ -63,7 +63,7 @@ class ProcessPaste extends ProcessKeyboard {
             });
             if (startParagraph !== endParagraph) {
                 if (endParagraph) {
-                    if (endParagraph.textContent === undefined || endParagraph.textContent === null ) return ''
+                    if (endParagraph.textContent === undefined || endParagraph.textContent === null ) return
                     const lastParagraph = paragraphs[paragraphs.length - 1];
                     this.appendTextToParagraph(lastParagraph, endParagraph.textContent);
                     endParagraph.parentElement?.removeChild(endParagraph);
@@ -80,7 +80,7 @@ class ProcessPaste extends ProcessKeyboard {
             if (paragraphs.length === 1 && startParagraph.textContent?.length !== undefined) {
                 lastParagraphLength += startParagraph.textContent.length;
             }
-            if (startParagraph.textContent === undefined || startParagraph.textContent === null) return ''
+            if (startParagraph.textContent === undefined || startParagraph.textContent === null) return
             if (paragraphs[0].textContent !== undefined && paragraphs[0].textContent !== null) {
                 this.appendTextToParagraph(startParagraph, paragraphs[0].textContent);
             }

@@ -71,7 +71,7 @@ class FormatText extends ProcessKeyboard {
         if (startParagraph === undefined) {
             return;
         }
-        this.repositionCursorInParagraph({ node: startParagraph, offset: 0 }, start);
+        this.repositionCursorInParagraph({ node: startParagraph as Element, offset: 0 }, start);
     }
 
 	set editor(value:HTMLDivElement) {

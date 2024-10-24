@@ -10,11 +10,6 @@ export interface INodeAndOffset {
     offset: number;
 }
 
-export interface INullNodeAndOffset {
-    node: null;
-    offset: null;
-}
-
 export interface ITextUpdateDetail {
     currentText: string;
 }
