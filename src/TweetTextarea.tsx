@@ -4,13 +4,15 @@ import Suggestions from './Suggestions';
 import { type HighlightProps,
 	type ChangeTextArgs,
 	type HighlightHandle,
-	type ProcessType } from './ts/types';
+	type ProcessType, 
+	type SuggestionHandler} from './ts/types';
 import patterns from "./ts/impl/patterns.ts";
 import InsertLineBreak from './ts/impl/InsertLineBreak.ts'
 import InsertParagraph from './ts/impl/InsertParagraph.ts'
 import InsertText from './ts/impl/InsertText.ts'
 import FormatText from './ts/impl/FormatText.ts'
 import ProcessPaste from "./ts/impl/ProcessPaste.ts";
+import { useKeyPress } from './store/context.tsx';
 const STORAGE_KEY = "highlightPattern";
 
 const TweetTextarea:React.FC<HighlightProps> =  ({
@@ -19,8 +21,10 @@ const TweetTextarea:React.FC<HighlightProps> =  ({
 	...props}:HighlightProps) => {
 	const [changeTextArgs, setChangeTextArgs ] = useState<ChangeTextArgs | null>(null)
 	const highlightRef = useRef<HighlightHandle>({ insertSuggestionAtCaret: () => {} })
+	const suggestionRef = useRef<SuggestionHandler>({ onInc: () => {}, onDec: () => {} })
 	let [process, setProcess] = useState<ProcessType | null>(null)
-	const [pattern, setPattern ] = useState<RegExp | null>(null) ;
+	const [pattern, setPattern ] = useState<RegExp | null>(null)
+	const { isSuggesting } = useKeyPress()
 	useEffect(() => {
 		const storedPattern = window.localStorage.getItem(STORAGE_KEY);
 		if (storedPattern && storedPattern.trim() !== "") {
@@ -45,7 +49,7 @@ const TweetTextarea:React.FC<HighlightProps> =  ({
 			formatText: new FormatText(pattern, highlightClassName)
 		})
 	}, [pattern]);
-	
+
 	const onChangeText = (event:ChangeTextArgs) => {
 		if(!event) return
 		setChangeTextArgs(event)
@@ -53,15 +57,28 @@ const TweetTextarea:React.FC<HighlightProps> =  ({
 	const onInsertSuggestion = (suggestion: string) => {
 		highlightRef.current?.insertSuggestionAtCaret(suggestion)
 	}
-	return (<>
+	const onKeyDown = (e:React.KeyboardEvent<HTMLDivElement>) => {
+		if(isSuggesting) {
+			if(e.key === 'ArrowUp') {
+				suggestionRef.current?.onDec()
+			} else if(e.key === 'ArrowDown') {
+				suggestionRef.current?.onInc()
+			}
+		}
+	}
+	return (
+			<div onKeyDown={(e) => onKeyDown(e)}>
 				<Highlight className={className}
 					onChangeText={onChangeText}
 					process={process}
 					ref={highlightRef}
 					{...props}
 				/>
-				<Suggestions changeTextArgs={changeTextArgs} onInsertSuggestion={onInsertSuggestion}/>
-			</>
+				<Suggestions
+					changeTextArgs={changeTextArgs}
+					onInsertSuggestion={onInsertSuggestion}
+					ref={suggestionRef}/>
+			</div>
 	)
 }
 

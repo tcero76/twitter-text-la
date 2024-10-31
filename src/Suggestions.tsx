@@ -1,15 +1,28 @@
-import { useEffect, useState } from 'react'
-import { type SuggestionsProps } from './ts/types';
+import { ForwardedRef, forwardRef, useEffect, useImperativeHandle, useState } from 'react'
+import { type SuggestionsProps, type SuggestionHandler } from './ts/types';
 import { getSuggestion } from './http/http';
+import { useKeyPress } from './store/context';
 
-const Suggestions = ({
+const Suggestions = forwardRef<SuggestionHandler,SuggestionsProps>(({
     changeTextArgs,
     onInsertSuggestion
-}:SuggestionsProps) => {
-    const [suggestions, setSuggestions] = useState<string[]>([]);
-    const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
-    const [showModal, setShowModal] = useState(false);
-
+}:SuggestionsProps, ref: ForwardedRef<SuggestionHandler>): JSX.Element => {
+    const [suggestions, setSuggestions] = useState<string[]>([])
+    const [selectedSuggestion, setSelectedSuggestion ] = useState<number>(0)
+    const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 })
+    const { enableSuggest, disableSuggest, isSuggesting } = useKeyPress()
+    useImperativeHandle(ref, () => ({
+        onInc() {
+            if(suggestions.length > selectedSuggestion+1) {
+                setSelectedSuggestion(selectedSuggestion+1)
+            }
+        },
+        onDec() {
+            if(selectedSuggestion > 0) {
+                setSelectedSuggestion(selectedSuggestion-1)
+            }
+        }
+    }))
     useEffect(() => {
         const firstShard:RegExp = /^#/;
         const selection = window.getSelection()
@@ -29,23 +42,32 @@ const Suggestions = ({
                             s.startsWith(lastWord.replace(firstShard, '')!)
                         );
                         setSuggestions(matchingSuggestions);
-                        setShowModal(matchingSuggestions.length > 0);
+                        if (matchingSuggestions.length > 0) {
+                            enableSuggest()
+                        }
                     })
                     .catch(res => {
+                        const matchingSuggestions = ["apple", "applebeans", "banana", "cherry", "date", "elderberry", "fig", "grape"].filter(s =>
+                            s.startsWith(lastWord.replace(firstShard, '')!)
+                        );
+                        setSuggestions(matchingSuggestions);
+                        if (matchingSuggestions.length > 0) {
+                            enableSuggest()
+                        }
                         console.error(res.message)
                     })
             } else {
-                setShowModal(false)
+                disableSuggest()
             }
         }
     },[changeTextArgs])
     const onClickSuggestion = (suggestion:string) => {
-        setShowModal(false)
         onInsertSuggestion(suggestion)
+        disableSuggest()
     }
     return (
         <>
-        {showModal && (
+        {isSuggesting && (
             <div id="suggestions"
             style={{
                 position: "absolute",
@@ -64,7 +86,7 @@ const Suggestions = ({
                 <div
                 id={idx.toString()}
                 key={idx}
-                className="suggestion"
+                className={"suggestion" + (idx===selectedSuggestion?" selected":"")}
                 style={{
                     padding: "5px",
                     cursor: "pointer",
@@ -77,6 +99,6 @@ const Suggestions = ({
             </div>
         )}
         </>
-    )}
+    )})
 
 export default Suggestions

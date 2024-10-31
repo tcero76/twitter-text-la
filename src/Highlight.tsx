@@ -9,6 +9,7 @@ import "./static/editorStyles.css";
 import ProcessKeyboard from "./ts/interfaces/ProcessKeyboard.ts";
 import ProcessParagraph from "./ts/impl/ProcessParagraph.ts";
 import CursorEvent from "./ts/impl/CursorEvent";
+import { useKeyPress } from "./store/context.tsx";
 
 let processParagraph:ProcessParagraph
 let textArea:ProcessKeyboard | null
@@ -23,6 +24,7 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 	): JSX.Element => {
 		const editorRef = useRef<HTMLDivElement>(document.createElement('div'));
 		const [text, setText] = useState<string>("");
+		const { isSuggesting } = useKeyPress()
 		let cursorEvent:CursorEvent = new CursorEvent()
 		if(process) {
 			var {
@@ -41,10 +43,15 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
                     if(iNodeAndOffset) {
                         const { node } = iNodeAndOffset
                         const word = node.textContent
-                        if (!word) return
-                        const beforeAfterText = text?.split(word,-1);
-                        const newText = beforeAfterText[0] + '#' + suggestion + beforeAfterText[1];
-                        const position = beforeAfterText[0].length + suggestion.length + 2;
+						let newText, position
+                        if (!word) {
+							newText = text + suggestion;
+							position = text.length + suggestion.length + 1;
+						} else {
+							const beforeAfterText = text?.split(word,-1);
+							newText = beforeAfterText[0] + '#' + suggestion + beforeAfterText[1];
+							position = beforeAfterText[0].length + suggestion.length + 2;
+						}
 						formatText.editor = editorRef.current
 						formatText.text = newText
                         formatText.textCursorPosition = {start:position, end:position};
@@ -73,17 +80,10 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 		};
 
 		const keyDownListener = (event: React.KeyboardEvent<HTMLDivElement>) => {
-			const range = document.getSelection()?.getRangeAt(0);
-            if(!range) return
-			const editor = editorRef.current
-            const rect = editor.getBoundingClientRect();
-            const cursorLocation = cursorEvent?.getCursorLocation(editor, range)
-            if (cursorLocation) {
-                onChangeText({text: editor.textContent,
-                    cursorLocation,
-                    caretCoordinates: { top: rect.height + 30,
-                        left: rect.left + cursorLocation.start + 20}})
-            }
+			if (isSuggesting && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+				event.preventDefault()
+				return
+			}
 			if (event.repeat && event.key !== "Enter" && event.key !== "Backspace") {
 				insertText.incRepeatCount();
 			} else {
@@ -107,9 +107,20 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 
 		const inputListener = (event: React.FormEvent<HTMLDivElement>) => {
 			const inputType = (event.nativeEvent as InputEvent).inputType;
-			const range = document.getSelection()?.getRangeAt(0);	
-			const editor = editorRef.current
+			const range = document.getSelection()?.getRangeAt(0)
 			if (!range) return;
+			const editor = editorRef.current
+            const rect = editor.getBoundingClientRect();
+            const cursorLocation = cursorEvent?.getCursorLocation(editor, range)
+            if (cursorLocation) {
+                onChangeText({
+					text: editor.textContent,
+                    cursorLocation,
+                    caretCoordinates: {
+						top: rect.height + 30,
+                        left: rect.left + cursorLocation.start + 20
+					}})
+            }
 			if (inputType === "deleteContentBackward"
 				|| inputType === "deleteContentForward"
 				|| inputType === "deleteByCut") {
@@ -131,6 +142,7 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 			editor.normalize()
 			render()
 		};
+
 		return (
 			<div className={`tweet-textarea ${highlightClassName || "tweet-textarea-general-style" }`} {...props}>
 				{text.length === 0 && placeholder && (<div className="placeholder">{placeholder}</div>)}

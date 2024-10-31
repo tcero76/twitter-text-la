@@ -48,6 +48,11 @@ export type HighlightHandle = {
     insertSuggestionAtCaret: (suggestion:string) => void
 }
 
+export type SuggestionHandler = {
+    onInc: () => void
+    onDec: () => void
+}
+
 export type SuggestionsProps = {
     changeTextArgs:ChangeTextArgs | null;
     onInsertSuggestion:(suggestion: string) => void

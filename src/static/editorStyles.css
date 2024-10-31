@@ -29,3 +29,8 @@ div p {
   color: cadetblue;
   font-weight: bold;
 }
+
+.selected {
+  background-color: blue;
+  color: cadetblue;
+}
