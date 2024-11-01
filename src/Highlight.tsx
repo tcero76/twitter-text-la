@@ -45,8 +45,9 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
                         const word = node.textContent
 						let newText, position
                         if (!word) {
-							newText = text + suggestion;
-							position = text.length + suggestion.length + 1;
+							const beforeAfterText = text?.substring(0,1);
+							newText = beforeAfterText + '#' + suggestion;
+							position =  beforeAfterText.length + suggestion.length + 1;
 						} else {
 							const beforeAfterText = text?.split(word,-1);
 							newText = beforeAfterText[0] + '#' + suggestion + beforeAfterText[1];
@@ -80,7 +81,11 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 		};
 
 		const keyDownListener = (event: React.KeyboardEvent<HTMLDivElement>) => {
-			if (isSuggesting && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+			if (isSuggesting &&
+				(event.key === 'ArrowUp' ||
+				event.key === 'ArrowDown'||
+				event.key === 'Tab' ||
+				event.key === 'Enter')) {
 				event.preventDefault()
 				return
 			}

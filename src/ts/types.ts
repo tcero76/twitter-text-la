@@ -51,6 +51,7 @@ export type HighlightHandle = {
 export type SuggestionHandler = {
     onInc: () => void
     onDec: () => void
+    onSelect: () => void
 }
 
 export type SuggestionsProps = {

@@ -21,6 +21,10 @@ const Suggestions = forwardRef<SuggestionHandler,SuggestionsProps>(({
             if(selectedSuggestion > 0) {
                 setSelectedSuggestion(selectedSuggestion-1)
             }
+        },
+        onSelect() {
+            onInsertSuggestion(suggestions[selectedSuggestion])
+            disableSuggest()
         }
     }))
     useEffect(() => {

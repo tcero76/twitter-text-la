@@ -21,7 +21,8 @@ const TweetTextarea:React.FC<HighlightProps> =  ({
 	...props}:HighlightProps) => {
 	const [changeTextArgs, setChangeTextArgs ] = useState<ChangeTextArgs | null>(null)
 	const highlightRef = useRef<HighlightHandle>({ insertSuggestionAtCaret: () => {} })
-	const suggestionRef = useRef<SuggestionHandler>({ onInc: () => {}, onDec: () => {} })
+	const suggestionRef =
+		useRef<SuggestionHandler>({ onInc: () => {}, onDec: () => {}, onSelect : () => {}})
 	let [process, setProcess] = useState<ProcessType | null>(null)
 	const [pattern, setPattern ] = useState<RegExp | null>(null)
 	const { isSuggesting } = useKeyPress()
@@ -63,6 +64,8 @@ const TweetTextarea:React.FC<HighlightProps> =  ({
 				suggestionRef.current?.onDec()
 			} else if(e.key === 'ArrowDown') {
 				suggestionRef.current?.onInc()
+			} else if(e.key === 'Tab' || e.key === 'Enter') {
+				suggestionRef.current?.onSelect()
 			}
 		}
 	}

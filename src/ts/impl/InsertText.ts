@@ -100,7 +100,7 @@ class InsertText extends ProcessKeyboard {
 				this.setCursorPosition(node, 0);
 				return null;
 			}
-			if (!(node.nodeType === 3)) {
+			if (node.nodeType !== 3) {
 				node = node.firstChild as Element;
 			}
 			if (offset > 0 && node.textContent?.length !== undefined) {
