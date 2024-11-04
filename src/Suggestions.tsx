@@ -26,9 +26,10 @@ const Suggestions = forwardRef<SuggestionHandler,SuggestionsProps>(({
             onInsertSuggestion(suggestions[selectedSuggestion])
             disableSuggest()
         }
+
     }))
     useEffect(() => {
-        const firstShard:RegExp = /^#/;
+        const firstShard:RegExp = /^#\D/;
         const selection = window.getSelection()
         if(selection?.rangeCount) {
             const range = selection.getRangeAt(0)
@@ -43,7 +44,7 @@ const Suggestions = forwardRef<SuggestionHandler,SuggestionsProps>(({
                 getSuggestion()
                     .then(res => {
                         const matchingSuggestions = res.data.filter(s =>
-                            s.startsWith(lastWord.replace(firstShard, '')!)
+                            s.startsWith(lastWord.replace('#', '')!)
                         );
                         setSuggestions(matchingSuggestions);
                         if (matchingSuggestions.length > 0) {
@@ -52,7 +53,7 @@ const Suggestions = forwardRef<SuggestionHandler,SuggestionsProps>(({
                     })
                     .catch(res => {
                         const matchingSuggestions = ["apple", "applebeans", "banana", "cherry", "date", "elderberry", "fig", "grape"].filter(s =>
-                            s.startsWith(lastWord.replace(firstShard, '')!)
+                            s.startsWith(lastWord.replace('#', '')!)
                         );
                         setSuggestions(matchingSuggestions);
                         if (matchingSuggestions.length > 0) {

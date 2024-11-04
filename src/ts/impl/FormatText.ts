@@ -52,19 +52,14 @@ class FormatText extends ProcessKeyboard {
         let textLengthToEndOfCurrentParagraph = 0;
         for (let i = 0; i < editor.childNodes.length; i++) {
             const currentParagraph = editor.childNodes[i];
-            if (
-                currentParagraph.textContent === undefined ||
-                currentParagraph.textContent?.length === undefined
-            ) {
+            if (currentParagraph.textContent === undefined ||
+                currentParagraph.textContent?.length === undefined) {
                 continue;
             }
-            textLengthToEndOfCurrentParagraph +=
-                currentParagraph.textContent.length + 1;
+            textLengthToEndOfCurrentParagraph += currentParagraph.textContent.length + 1;
             if (textLengthToEndOfCurrentParagraph >= start) {
                 startParagraph = currentParagraph;
-                start -=
-                    textLengthToEndOfCurrentParagraph -
-                    (currentParagraph.textContent.length + 1);
+                start -= textLengthToEndOfCurrentParagraph - (currentParagraph.textContent.length + 1);
                 break;
             }
         }

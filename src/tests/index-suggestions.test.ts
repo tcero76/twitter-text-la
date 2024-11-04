@@ -95,3 +95,43 @@ test("when the user write two words whith first char a shard continuous", async 
 	await page.click('div.suggestion', { delay: 500})
 	await expect(editor).toHaveText('Lorem #cherry #applebeans')
 })
+
+test("when the user write a lonely shard and select an alternative with Tab", async ({
+	page
+}) => {
+	const editor = page.locator("div.input-area")
+	await editor.pressSequentially("Lorem #", { delay: 50})
+	await page.keyboard.press("Tab")
+	await expect(editor).toHaveText('Lorem #')
+	const suggestion = page.locator("div.suggestion")
+	await expect(await suggestion.count()).toBe(0)
+})
+
+test("when the user write a shard and select an alternative with Tab", async ({
+	page
+}) => {
+	const editor = page.locator("div.input-area")
+	await editor.pressSequentially("Lorem #ap", { delay: 50})
+	await page.keyboard.press("Tab")
+	await expect(editor).toHaveText('Lorem #apple')
+})
+
+test("when the user write a shard and select an alternative with ArrowDown and Tab", async ({
+	page
+}) => {
+	const editor = page.locator("div.input-area")
+	await editor.pressSequentially("Lorem #ap", { delay: 50})
+	await page.keyboard.press("ArrowDown")
+	await page.keyboard.press("Tab")
+	await expect(editor).toHaveText('Lorem #applebeans')
+})
+
+test("when the user write a shard and select an alternative with ArrowDown and Enter", async ({
+	page
+}) => {
+	const editor = page.locator("div.input-area")
+	await editor.pressSequentially("Lorem #ap", { delay: 50})
+	await page.keyboard.press("ArrowDown")
+	await page.keyboard.press("Enter")
+	await expect(editor).toHaveText('Lorem #applebeans')
+})

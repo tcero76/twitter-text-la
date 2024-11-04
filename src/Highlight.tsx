@@ -44,22 +44,19 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
                         const { node } = iNodeAndOffset
                         const word = node.textContent
 						let newText, position
-                        if (!word) {
-							const beforeAfterText = text?.substring(0,1);
-							newText = beforeAfterText + '#' + suggestion;
-							position =  beforeAfterText.length + suggestion.length + 1;
-						} else {
+                        if (word) {
 							const beforeAfterText = text?.split(word,-1);
 							newText = beforeAfterText[0] + '#' + suggestion + beforeAfterText[1];
 							position = beforeAfterText[0].length + suggestion.length + 2;
+							formatText.editor = editorRef.current
+							formatText.text = newText
+							formatText.textCursorPosition = {start:position, end:position};
+							textArea = formatText
+							render();
 						}
-						formatText.editor = editorRef.current
-						formatText.text = newText
-                        formatText.textCursorPosition = {start:position, end:position};
-						textArea = formatText
-                        render();
                     }
-            }}
+            	}
+			}
         })
 
 		useEffect(() => {

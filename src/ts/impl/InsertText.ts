@@ -3,7 +3,7 @@ import { INodeAndOffset } from "../types"
 
 class InsertText extends ProcessKeyboard {
 
-	private iNodeAndOffset:INodeAndOffset | null = null
+	private iNodeAndOffset:INodeAndOffset
 	private _repeat:boolean
 	private _repeatCount:number
 
@@ -11,6 +11,7 @@ class InsertText extends ProcessKeyboard {
 		super(pattern, highlightClassName)
 		this._repeat = false
 		this._repeatCount = 0
+		this.iNodeAndOffset = { node:document.createElement('div'), offset: 0}
 	}
 
 	public process(range:Range):void {
@@ -61,6 +62,9 @@ class InsertText extends ProcessKeyboard {
 		let currentLength = 0;
 		for (let i = offsetInParent; i < parentParagraph.childNodes.length; i++) {
 			const child = parentParagraph.childNodes[i];
+			if((child as Element).tagName === "SPAN") {
+				this.iNodeAndOffset.node = child as Element
+			}
 			if ((child as Element).tagName === "BR") {
 				++currentLength;
 			}
@@ -76,6 +80,7 @@ class InsertText extends ProcessKeyboard {
 						}
 					}
 					this.setCursorPosition(startNode, offset);
+					this.iNodeAndOffset.offset = offset
 					break;
 				}
 			}
@@ -86,7 +91,6 @@ class InsertText extends ProcessKeyboard {
 		let node = range.startContainer as Element;
 		let offset = range.startOffset;
 		if(!node || !offset) return null
-		this.iNodeAndOffset = { node , offset }
 		if (node.tagName === "DIV") {
 			const currentParagraph = node.childNodes[offset - 1];
 			this.setCursorPosition(currentParagraph, currentParagraph?.childNodes.length);
