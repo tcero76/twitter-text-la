@@ -52,13 +52,6 @@ const Suggestions = forwardRef<SuggestionHandler,SuggestionsProps>(({
                         }
                     })
                     .catch(res => {
-                        const matchingSuggestions = ["apple", "applebeans", "banana", "cherry", "date", "elderberry", "fig", "grape"].filter(s =>
-                            s.startsWith(lastWord.replace('#', '')!)
-                        );
-                        setSuggestions(matchingSuggestions);
-                        if (matchingSuggestions.length > 0) {
-                            enableSuggest()
-                        }
                         console.error(res.message)
                     })
             } else {
