@@ -36,5 +36,3 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Deploy
         uses: actions/deploy-pages@v4
-        env:
-          VITE_APP_PROFILE: DEV
