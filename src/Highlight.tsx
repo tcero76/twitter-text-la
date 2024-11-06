@@ -48,8 +48,11 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
 							const beforeAfterText = text?.split(word,-1);
 							newText = beforeAfterText[0] + '#' + suggestion + beforeAfterText[1];
 							position = beforeAfterText[0].length + suggestion.length + 2;
+							node.textContent = '#' + suggestion
 							formatText.editor = editorRef.current
-							formatText.text = newText
+							if(editorRef.current.textContent) {
+								formatText.text = editorRef.current.textContent
+							}
 							formatText.textCursorPosition = {start:position, end:position};
 							textArea = formatText
 							render();
