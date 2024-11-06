@@ -1,17 +1,13 @@
 # Twitter-Text-la
 
-Demo de Área de Texto tipo Twitter, hecho con React+Typescript
+[Demo](https://tcero76.github.io/twitter-text-la/). Área de Texto tipo Twitter, hecho con React+Typescript
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![alt text](img/show.GIF)
 
-## Expanding the ESLint configuration
+# Características:
+- [testing](https://github.com/tcero76/twitter-text-la/tree/master/src/tests) Testing hecho con Playwright
 
-
-```sh
-npm run install
-npm run dev
-```
+- Patrón de diseño Strategy.
 
 
 
