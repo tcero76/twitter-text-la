@@ -39,21 +39,32 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
         useImperativeHandle(ref, () => {
             return {
                 insertSuggestionAtCaret(suggestion: string):void {
+					let firstShard:RegExp = /#[^\s#]+/g;
                     const iNodeAndOffset = insertText.NodeAndOffset
                     if(iNodeAndOffset) {
                         const { node } = iNodeAndOffset
                         const word = node.textContent
-						let newText, position
                         if (word) {
-							const beforeAfterText = text?.split(word,-1);
-							newText = beforeAfterText[0] + '#' + suggestion + beforeAfterText[1];
-							position = beforeAfterText[0].length + suggestion.length + 2;
+							const positionArr = text.split(firstShard).map(str => str.length)
 							node.textContent = '#' + suggestion
+							let innerText = editorRef.current.innerText
+							const domText = innerText.split(/\n\n/g,-1).flatMap(str => str.match(firstShard)).filter(item => item !=null)
+							let textLinear = text.split(/\n\n/g,-1).flatMap(str => str.match(firstShard)).filter(item => item !=null)
+							if (!domText || !textLinear) return
+							let i = -1
+							let position:number = 0
+							formatText.text = text.replace(firstShard, ():string => {
+								i++
+								position += positionArr[i]
+								if(innerText[i] !== textLinear[i]) {
+									position += domText[i].length
+									return domText[i]
+								} else {
+									return textLinear[i]
+								}
+							})
 							formatText.editor = editorRef.current
-							if(editorRef.current.textContent) {
-								formatText.text = editorRef.current.textContent
-							}
-							formatText.textCursorPosition = {start:position, end:position};
+							formatText.textCursorPosition = {start:position, end:position };
 							textArea = formatText
 							render();
 						}

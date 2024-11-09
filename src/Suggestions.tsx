@@ -29,7 +29,7 @@ const Suggestions = forwardRef<SuggestionHandler,SuggestionsProps>(({
 
     }))
     useEffect(() => {
-        const firstShard:RegExp = /^#\D/;
+        const firstShard:RegExp = /^#\D.*\S$/;
         const selection = window.getSelection()
         if(selection?.rangeCount) {
             const range = selection.getRangeAt(0)
