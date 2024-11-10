@@ -130,7 +130,7 @@ const Highlight = forwardRef<HighlightHandle, ITweetTextareaProps>(({
             const cursorLocation = cursorEvent?.getCursorLocation(editor, range)
             if (cursorLocation) {
                 onChangeText({
-					text: editor.textContent,
+					text: editor.innerText,
                     cursorLocation,
                     caretCoordinates: {
 						top: rect.height + 30,

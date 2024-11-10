@@ -29,7 +29,8 @@ const Suggestions = forwardRef<SuggestionHandler,SuggestionsProps>(({
 
     }))
     useEffect(() => {
-        const firstShard:RegExp = /^#\D.*\S$/;
+        const firstShard:RegExp = /^#\D+$/
+        const palabras:RegExp = /\s/
         const selection = window.getSelection()
         if(selection?.rangeCount) {
             const range = selection.getRangeAt(0)
@@ -38,9 +39,19 @@ const Suggestions = forwardRef<SuggestionHandler,SuggestionsProps>(({
             if(!range || !text) return
             if (!cursorLocation) return
             setModalPosition(caretCoordinates);
-            const inputText = text.slice(0, cursorLocation.start);
-            const lastWord = inputText.split(/\s/g).pop()??'';
-            if(firstShard.test(lastWord)) {
+            const lineas = text.split("\n\n").map(str => str.replace(/\n/,''))
+            const linesWords = lineas.flatMap(str => str.split(palabras))
+            const lineasCount = linesWords.map(str => str.length)
+            let index:number = 0
+            lineasCount.reduce((acumulador:number, valorActual:number, idx:number) => {
+                acumulador+=valorActual+1
+                if(cursorLocation.start<=acumulador && index === 0) {
+                    index = idx
+                }
+                return acumulador
+            },-1)
+            const lastWord = linesWords[index]??'';
+            if(firstShard.test(linesWords[index])) {
                 getSuggestion()
                     .then(res => {
                         const matchingSuggestions = res.data.filter(s =>
@@ -56,6 +67,7 @@ const Suggestions = forwardRef<SuggestionHandler,SuggestionsProps>(({
                     })
             } else {
                 disableSuggest()
+                setSelectedSuggestion(0)
             }
         }
     },[changeTextArgs])
