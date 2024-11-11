@@ -52,6 +52,7 @@ export type SuggestionHandler = {
     onInc: () => void
     onDec: () => void
     onSelect: () => void
+    suggestOff: () => void
 }
 
 export type SuggestionsProps = {

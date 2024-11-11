@@ -66,6 +66,8 @@ const TweetTextarea:React.FC<HighlightProps> =  ({
 				suggestionRef.current?.onInc()
 			} else if(e.key === 'Tab' || e.key === 'Enter') {
 				suggestionRef.current?.onSelect()
+			} else if(e.key === 'Escape') {
+				suggestionRef.current?.suggestOff()
 			}
 		}
 	}

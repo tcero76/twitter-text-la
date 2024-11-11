@@ -25,6 +25,9 @@ const Suggestions = forwardRef<SuggestionHandler,SuggestionsProps>(({
         onSelect() {
             onInsertSuggestion(suggestions[selectedSuggestion])
             disableSuggest()
+        },
+        suggestOff() {
+            disableSuggest()
         }
 
     }))
