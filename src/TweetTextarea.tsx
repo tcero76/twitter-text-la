@@ -22,7 +22,7 @@ const TweetTextarea:React.FC<HighlightProps> =  ({
 	const [changeTextArgs, setChangeTextArgs ] = useState<ChangeTextArgs | null>(null)
 	const highlightRef = useRef<HighlightHandle>({ insertSuggestionAtCaret: () => {} })
 	const suggestionRef =
-		useRef<SuggestionHandler>({ onInc: () => {}, onDec: () => {}, onSelect : () => {}})
+		useRef<SuggestionHandler>({ onInc: () => {}, onDec: () => {}, onSelect : () => {}, suggestOff: () => {} })
 	let [process, setProcess] = useState<ProcessType | null>(null)
 	const [pattern, setPattern ] = useState<RegExp | null>(null)
 	const { isSuggesting } = useKeyPress()
