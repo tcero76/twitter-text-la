@@ -1,5 +1,7 @@
 # Twitter-Text-la
 
+Proyecto basado en [tweet-textarea-react](https://github.com/dreamjet31/tweet-textarea-react)
+
 [Demo](https://tcero76.github.io/twitter-text-la/). Área de Texto tipo Twitter, hecho con React+Typescript
 
 ![alt text](img/show.GIF)
