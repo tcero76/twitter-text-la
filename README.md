@@ -9,5 +9,4 @@
 
 - Patrón de diseño Strategy.
 
-
-
+- Accesos directos para manipular sugerencias
